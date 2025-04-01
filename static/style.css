@@ -1,0 +1,84 @@
+/* static/style.css */
+
+:root {
+    --bg-dark: #1a202c;
+    --bg-controls: #2d3748;
+    --text-light: #edf2f7;
+    --text-muted: #a0aec0;
+    --border-dark: #4a5568;
+    --accent-color: #ff8c00;
+    --accent-hover: #e67e00;
+    --graph-bg: #f7fafc;
+    --node-default-bg: #4a5568;
+    --node-default-border: #2d3748;
+    --edge-visible: var(--accent-color);
+    --highlight-border: var(--accent-color);
+    --highlight-bg: rgba(255, 140, 0, 0.3);
+    /* *** NEW: Neighbor Highlight Colors *** */
+    --neighbor-bg: #e2e8f0; /* Light grey background on light graph */
+    --neighbor-border: #a0aec0; /* Muted border */
+  
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  
+  /* ... (Keep ALL previous CSS rules: body, header, main-wrapper, main, controls-container, etc.) ... */
+  body { font-family: var(--font-family); margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-light); display: flex; flex-direction: column; min-height: 100vh; font-weight: 400; }
+  header { background-color: var(--bg-controls); color: var(--text-light); padding: 1rem 2rem; text-align: center; flex-shrink: 0; border-bottom: 1px solid var(--border-dark); }
+  header h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+  .main-wrapper { flex-grow: 1; padding: 1.5rem; overflow: hidden; }
+  main { display: flex; height: 100%; gap: 1.5rem; }
+  .controls-container { flex: 0 0 280px; background-color: var(--bg-controls); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-dark); height: 100%; display: flex; flex-direction: column; overflow-y: auto; }
+  .controls-container h2 { margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 600; color: var(--text-light); border-bottom: 1px solid var(--border-dark); padding-bottom: 0.75rem; flex-shrink: 0; }
+  .control-group { margin-bottom: 1.25rem; flex-shrink: 0; }
+  .control-group label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.875rem; color: var(--text-muted); }
+  .control-group select:not([multiple]) { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--border-dark); border-radius: 4px; font-size: 0.9rem; box-sizing: border-box; background-color: var(--bg-dark); color: var(--text-light); cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a0aec0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.7rem top 50%; background-size: 0.65rem auto; }
+  .control-group select[multiple] { width: 100%; border: 1px solid var(--border-dark); border-radius: 4px; font-size: 0.85rem; box-sizing: border-box; min-height: 120px; max-height: 220px; overflow-y: auto; padding: 0.5rem; background-color: var(--bg-dark); color: var(--text-light); }
+  .control-group select[multiple] option { padding: 5px 10px; cursor: pointer; border-radius: 3px; margin-bottom: 2px; }
+  .control-group select[multiple] option:checked { background-color: var(--accent-color); color: var(--bg-dark); font-weight: 500; }
+  .control-group select[multiple] option:hover { background-color: var(--border-dark); color: var(--text-light); }
+  button#resetFilters { width: 100%; padding: 0.7rem; background-color: var(--accent-color); color: var(--bg-dark); border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; transition: background-color 0.2s ease; margin-top: auto; flex-shrink: 0; }
+  button#resetFilters:hover { background-color: var(--accent-hover); }
+  .graph-container { position: relative; flex-grow: 1; background-color: var(--bg-controls); border-radius: 8px; border: 1px solid var(--border-dark); overflow: hidden; display: flex; padding: 5px; }
+  #cy { width: 100%; height: 100%; background-color: var(--graph-bg); border-radius: 4px; opacity: 0; transition: opacity 0.5s ease-in-out; }
+  #cy.ready { opacity: 1; }
+  #loadingIndicator { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1em; font-weight: 500; color: var(--text-light); z-index: 10; background-color: rgba(45, 55, 72, 0.9); padding: 12px 18px; border-radius: 5px; }
+  
+  /* --- Cytoscape Element Base Styles --- */
+  node { background-color: var(--node-default-bg); border-color: var(--node-default-border); border-width: 1px; width: 8px; height: 8px; shape: ellipse; transition-property: background-color, border-color, border-width, width, height, opacity; transition-duration: 0.2s; }
+  edge { display: none; line-color: var(--border-dark); width: 1px; opacity: 0.6; curve-style: haystack; haystack-radius: 0; transition-property: line-color, width, opacity; transition-duration: 0.2s; }
+  
+  /* Style for nodes when selected OR primary highlight */
+  node:selected, node.highlighted {
+      background-color: var(--highlight-bg);
+      border-color: var(--highlight-border);
+      border-width: 2.5px;
+      z-index: 99;
+  }
+  
+  /* *** NEW: Style for NEIGHBOR nodes when highlighted *** */
+  node.neighbor-highlight {
+      background-color: var(--neighbor-bg); /* Light grey */
+      border-color: var(--neighbor-border); /* Muted grey border */
+      border-width: 1.5px; /* Thinner than primary highlight */
+      opacity: 0.9; /* Slightly less opaque maybe */
+      /* Ensure it's below selected nodes but above default */
+      z-index: 90;
+      /* Can add transitions if desired */
+      transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  }
+  
+  
+  /* Style for edges when they should be visible */
+  edge.visible-edge {
+      display: element;
+      line-color: var(--edge-visible);
+      opacity: 0.8;
+      width: 1.5px; /* Make dynamic in JS if needed */
+      z-index: 50;
+  }
+  
+  /* Style for elements being filtered out */
+  .filtered-out { opacity: 0.1 !important; transition-property: opacity; transition-duration: 0.3s; }
+  
+  /* Tippy.js Material theme */
+  .tippy-box[data-theme~='material'] { font-family: var(--font-family); font-size: 0.85rem; }

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Graph Visualization</title>
+
+  <!-- Google Font (Example: Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Cytoscape.js -->
+  <script src="https://unpkg.com/cytoscape@3.23.0/dist/cytoscape.min.js"></script>
+
+<!-- Tippy.js for Tooltips -->
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+<!-- Use Material theme for dark background -->
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/material.css"/>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+  <header>
+    <!-- Simple Title to match dark theme -->
+    <h1>O Congresso Nacional</h1>
+  </header>
+
+  <!-- Wrapper for main content -->
+  <div class="main-wrapper">
+      <main>
+        <aside class="controls-container">
+          <h2>Controls</h2>
+
+          <div class="control-group">
+            <label for="colorBy">Color Nodes By:</label>
+            <select id="colorBy">
+              <option value="default">Default</option>
+              <option value="party">Party</option>
+              <option value="coalizao">Coalizao</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="filterPartySelect">Filter by Party (Multiple):</label>
+            <select id="filterPartySelect" multiple>
+              <option value="" disabled>Loading parties...</option>
+              <!-- Options will be populated by script -->
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label for="filterCoalizaoSelect">Filter by Coalizao (Multiple):</label>
+            <select id="filterCoalizaoSelect" multiple>
+               <option value="" disabled>Loading coalizoes...</option>
+               <!-- Options will be populated by script -->
+            </select>
+          </div>
+
+          <button id="resetFilters">Reset View</button>
+
+        </aside>
+
+        <section class="graph-container">
+          <div id="loadingIndicator">Loading Graph...</div>
+          <div id="cy"></div>
+        </section>
+      </main>
+  </div>
+
+  <!-- Custom JavaScript -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
