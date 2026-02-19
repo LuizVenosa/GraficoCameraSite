@@ -43,6 +43,7 @@ def load_data(similarity_df, similarity_matrix, partidos, threshold=0.70, top_k=
     # Assign node attributes from partidos data.
     # Assumes partidos CSV has at least a 'siglaPartido' column and optionally a 'state' column.
     for node in G.nodes():
+        coalizao = 'Unknown'
         if node in partidos.index:
             party = partidos.at[node, 'siglaPartido']
             state = partidos.at[node, 'state'] if 'state' in partidos.columns else 'Unknown'
@@ -66,7 +67,16 @@ def load_data(similarity_df, similarity_matrix, partidos, threshold=0.70, top_k=
 def main():
     # Load your CSV data (ensure votes_pivot.csv and partidos.csv are in this folder)
     votes_pivot = pd.read_csv('data/votes_pivot.csv', index_col=0)
-    partidos = pd.read_csv('data/partidos.csv', index_col=0)
+    try:
+        partidos = pd.read_csv('data/partidos.csv', index_col=0)
+    except pd.errors.ParserError:
+        # Fallback parser for malformed rows; skips invalid lines instead of failing build.
+        partidos = pd.read_csv(
+            'data/partidos.csv',
+            index_col=0,
+            engine='python',
+            on_bad_lines='skip'
+        )
     
     # Compute cosine similarity and build DataFrame
     similarity_matrix = cosine_similarity(votes_pivot)
