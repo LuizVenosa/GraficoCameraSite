@@ -77,8 +77,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: { 
                     id: node.id, 
                     party: party, 
+                    state: node.uf || 'Unknown',
                     coalizao: coalizao, 
                     centrality: node.centrality, 
+                    initialX: node.x * 400,
+                    initialY: node.y * 400,
                 }, 
                 position: { x: node.x * 400, y: node.y * 400 }, 
                 classes: 'node-base' 
@@ -115,6 +118,32 @@ document.addEventListener('DOMContentLoaded', function() {
                         'z-index': 90,
                         'transition-property': 'background-color, border-color, opacity', 'transition-duration': '0.2s' }
                  },
+                {
+                    selector: 'node.hovered',
+                    style: {
+                        'label': (ele) => {
+                            const name = ele.data('id') || 'Unknown';
+                            const party = ele.data('party') || 'N/A';
+                            const state = ele.data('state') || 'Unknown';
+                            return `${name}\n${party}\n${state}`;
+                        },
+                        'font-size': '10px',
+                        'font-weight': '600',
+                        'line-height': 1.25,
+                        'text-valign': 'top',
+                        'text-halign': 'center',
+                        'text-margin-y': '-10px',
+                        'text-wrap': 'wrap',
+                        'text-max-width': '160px',
+                        'text-background-color': '#1f2937',
+                        'text-background-opacity': 0.9,
+                        'text-background-padding': '5px',
+                        'text-background-shape': 'roundrectangle',
+                        'color': '#ffffff',
+                        'text-outline-width': 0,
+                        'z-index': 120
+                    }
+                },
                 { selector: '.filtered-out', style: { 'opacity': 0.1, 'transition-property': 'opacity', 'transition-duration': '0.3s' } }
             ],
             layout: { name: 'preset', animate: true, animationDuration: 500, fit: true, padding: 30 },
@@ -321,6 +350,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 .removeStyle('display opacity')
                 .style('display', 'element')
                 .deselect();
+
+            // Restore original node positions from initial imported coordinates.
+            cy.nodes().forEach(node => {
+                const x = node.data('initialX');
+                const y = node.data('initialY');
+                if (Number.isFinite(x) && Number.isFinite(y)) {
+                    node.position({ x, y });
+                }
+            });
         });
         
         updateColors();
@@ -349,70 +387,14 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Setting up interaction listeners...");
 
         cy.on('mouseover', 'node', function(event) {
-            const node = event.target;
-            
-            const name = node.data('id') || 'Unknown';
-            const party = node.data('party') || 'N/A';
-            const coalizao = node.data('coalizao') || 'Unknown';
-            
-            const tooltipContent = `
-                <div style="text-align:center; padding: 5px;">
-                    <div style="font-weight:bold; margin-bottom:4px;">${name}</div>
-                    <div>${party}${coalizao !== 'Unknown' ? ' - ' + coalizao : ''}</div>
-                </div>
-            `;
-            
-            const tooltip = document.createElement('div');
-            tooltip.innerHTML = tooltipContent;
-            tooltip.style.position = 'absolute';
-            tooltip.style.zIndex = '999';
-            tooltip.style.backgroundColor = '#333';
-            tooltip.style.color = 'white';
-            tooltip.style.padding = '8px';
-            tooltip.style.borderRadius = '4px';
-            tooltip.style.pointerEvents = 'none';
-            tooltip.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
-            tooltip.className = 'cy-tooltip';
-            document.body.appendChild(tooltip);
-            
-            const containerRect = cy.container().getBoundingClientRect();
-            const nodePosition = node.renderedPosition();
-            const nodeSize = Math.max(node.renderedWidth(), node.renderedHeight());
-            
-            tooltip.style.left = (containerRect.left + nodePosition.x) + 'px';
-            tooltip.style.top = (containerRect.top + nodePosition.y - nodeSize - tooltip.offsetHeight - 10) + 'px';
-            
-            node.scratch('_tooltip', tooltip);
+            event.target.addClass('hovered');
         });
 
         cy.on('mouseout', 'node', function(event) {
-            const node = event.target;
-            const tooltip = node.scratch('_tooltip');
-            if (tooltip) {
-                document.body.removeChild(tooltip);
-                node.scratch('_tooltip', null);
-            }
-        });
-
-        cy.on('pan zoom', function() {
-            cy.nodes().forEach(node => {
-                const tooltip = node.scratch('_tooltip');
-                if (tooltip) {
-                    const containerRect = cy.container().getBoundingClientRect();
-                    const nodePosition = node.renderedPosition();
-                    const nodeSize = Math.max(node.renderedWidth(), node.renderedHeight());
-                    
-                    tooltip.style.left = (containerRect.left + nodePosition.x) + 'px';
-                    tooltip.style.top = (containerRect.top + nodePosition.y - nodeSize - tooltip.offsetHeight - 10) + 'px';
-                }
-            });
+            event.target.removeClass('hovered');
         });
 
         cy.on('drag', function() {
-            document.querySelectorAll('.cy-tooltip').forEach(el => {
-                document.body.removeChild(el);
-            });
-            
             cy.nodes().removeClass('neighbor-highlight');
         });
 
